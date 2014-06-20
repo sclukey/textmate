@@ -1,5 +1,4 @@
 #import "ProjectLayoutView.h"
-#import "DocumentSplitsView.h"
 #import <OakAppKit/OakUIConstructionFunctions.h>
 #import <OakAppKit/NSColor Additions.h>
 #import <Preferences/Keys.h>
@@ -12,7 +11,7 @@ NSString* const kUserDefaultsHTMLOutputSizeKey   = @"htmlOutputSize";
 @interface ProjectLayoutView ()
 @property (nonatomic) NSView* fileBrowserDivider;
 @property (nonatomic) NSView* htmlOutputDivider;
-@property (nonatomic) DocumentSplitsView* splitsView;
+@property (nonatomic) NSView* splitsView;
 @property (nonatomic) NSLayoutConstraint* fileBrowserWidthConstraint;
 @property (nonatomic) NSLayoutConstraint* htmlOutputSizeConstraint;
 @property (nonatomic) NSMutableArray* myConstraints;
@@ -35,10 +34,6 @@ NSString* const kUserDefaultsHTMLOutputSizeKey   = @"htmlOutputSize";
 		_myConstraints    = [NSMutableArray array];
 		_fileBrowserWidth = [[NSUserDefaults standardUserDefaults] integerForKey:kUserDefaultsFileBrowserWidthKey];
 		_htmlOutputSize   = NSSizeFromString([[NSUserDefaults standardUserDefaults] stringForKey:kUserDefaultsHTMLOutputSizeKey]);
-
-		self.splitsView = [[DocumentSplitsView alloc] initWithFrame:aRect];
-		[self.splitsView setTranslatesAutoresizingMaskIntoConstraints:NO];
-		[self addSubview:self.splitsView];
 
 		[self userDefaultsDidChange:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userDefaultsDidChange:) name:NSUserDefaultsDidChangeNotification object:[NSUserDefaults standardUserDefaults]];
@@ -71,8 +66,7 @@ NSString* const kUserDefaultsHTMLOutputSizeKey   = @"htmlOutputSize";
 }
 
 - (void)setTabBarView:(NSView*)aTabBarView           { _tabBarView     = [self replaceView:_tabBarView      withView:aTabBarView];      }
-//- (void)setDocumentView:(NSView*)aDocumentView       { _documentView   = [self replaceView:_documentView    withView:aDocumentView];    }
-- (void)setDocumentView:(NSView*)aDocumentView       { self.splitsView.activeDocumentView = aDocumentView; }
+- (void)setDocumentSplitsView:(NSView*)aSplitView    { self.splitsView = [self replaceView:self.splitsView  withView:aSplitView];       }
 
 - (void)setHtmlOutputView:(NSView*)aHtmlOutputView
 {
@@ -138,7 +132,7 @@ NSString* const kUserDefaultsHTMLOutputSizeKey   = @"htmlOutputSize";
 	// =======================
 
 	// top
-	CONSTRAINT(@"V:|[tabBarView]", 0);
+	CONSTRAINT(@"V:|[tabBarView(<=24)]", 0);
 
 	// left + right
 	if(_tabsAboveDocument && _fileBrowserView && _fileBrowserOnRight)

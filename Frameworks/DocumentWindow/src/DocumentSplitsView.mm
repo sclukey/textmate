@@ -1,8 +1,21 @@
 #import "DocumentSplitsView.h"
+#import <OakTextView/OakDocumentView.h>
 #import <oak/debug.h>
+
+@interface OakSplitView : NSSplitView
+@end
+
+@implementation OakSplitView
++ (BOOL)requiresConstraintBasedLayout
+{
+	return YES;
+}
+@end
 
 @interface DocumentSplitsView ()
 @property (nonatomic) NSMutableArray* myConstraints;
+@property (nonatomic) OakSplitView* splitView;
+@property (nonatomic) NSMutableArray* documentViews;
 @end
 
 @implementation DocumentSplitsView { OBJC_WATCH_LEAKS(ProjectLayoutView); }
@@ -11,30 +24,61 @@
 	if(self = [super initWithFrame:aRect])
 	{
 		_myConstraints = [NSMutableArray array];
+		_documentViews = [NSMutableArray array];
+		
+		self.splitView = [[OakSplitView alloc] initWithFrame:aRect];
+		[self.splitView setTranslatesAutoresizingMaskIntoConstraints:NO];
+		[self addSubview:self.splitView];
+		[self.splitView setVertical:NO];
+		[self.splitView setDividerStyle:NSSplitViewDividerStyleThin];
+		
+		[self createSplit:YES];
 	}
 	return self;
 }
 
-- (NSView*)replaceView:(NSView*)oldView withView:(NSView*)newView
+- (void)createSplit:(bool)isVertical
 {
-	if(newView == oldView)
-		return oldView;
-
-	[oldView removeFromSuperview];
-
-	if(newView)
-	{
-		[newView setTranslatesAutoresizingMaskIntoConstraints:NO];
-		[self addSubview:newView];
-	}
-
-	[self setNeedsUpdateConstraints:YES];
-	return newView;
+	[self setDocumentView:[[OakDocumentView alloc] init]];
+	[self.documentView setTranslatesAutoresizingMaskIntoConstraints:NO];
+	[_documentViews addObject:self.documentView];
+	[self.splitView addSubview:self.documentView];
+	[self.splitView adjustSubviews];
 }
 
-- (void)setActiveDocumentView:(NSView*)aDocumentView
+- (OakTextView*)getTextView
 {
-	_activeDocumentView = [self replaceView:_activeDocumentView withView:aDocumentView];
+	return self.documentView.textView;
+}
+
+- (void)setThemeWithUUID:(NSString*)themeUUID
+{
+	for (OakDocumentView* docView in _documentViews)
+	{
+		[docView setThemeWithUUID:themeUUID];
+	}
+}
+
+- (void)setHideStatusBar:(BOOL)flag
+{
+	_hideStatusBar = flag;
+	for (OakDocumentView* docView in _documentViews)
+	{
+		docView.hideStatusBar = flag;
+	}
+}
+
+- (void)removeTextViewDelegates
+{
+	for (OakDocumentView* docView in _documentViews)
+	{
+		docView.textView.delegate = nil;
+	}
+}
+
+- (void)setDocumentView:(OakDocumentView*)aDocumentView
+{
+	_documentView = aDocumentView;
 }
 
 #ifndef CONSTRAINT
@@ -48,7 +92,7 @@
 	[super updateConstraints];
 
 	NSDictionary* views = @{
-		@"documentView"               : _activeDocumentView,
+		@"documentView"               : self.splitView,
 	};
 
 	CONSTRAINT(@"V:|[documentView]|", 0);

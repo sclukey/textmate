@@ -2,6 +2,7 @@
 #import "ProjectLayoutView.h"
 #import "DocumentOpenHelper.h"
 #import "DocumentSaveHelper.h"
+#import "DocumentSplitsView.h"
 #import "DocumentCommand.h" // show_command_error
 #import "OakRunCommandWindowController.h"
 #import <OakAppKit/NSAlert Additions.h>
@@ -59,8 +60,7 @@ static BOOL IsInShouldTerminateEventLoop = NO;
 @interface DocumentController () <NSWindowDelegate, OakTabBarViewDelegate, OakTabBarViewDataSource, OakTextViewDelegate, OakFileBrowserDelegate, QLPreviewPanelDelegate, QLPreviewPanelDataSource>
 @property (nonatomic) ProjectLayoutView*          layoutView;
 @property (nonatomic) OakTabBarView*              tabBarView;
-@property (nonatomic) OakDocumentView*            documentView;
-@property (nonatomic) OakTextView*                textView;
+@property (nonatomic) DocumentSplitsView*         documentsView;
 @property (nonatomic) OakFileBrowser*             fileBrowser;
 
 @property (nonatomic) BOOL                        disableFileBrowserWindowResize;
@@ -278,13 +278,12 @@ namespace
 		self.tabBarView.dataSource = self;
 		self.tabBarView.delegate   = self;
 
-		self.documentView = [[OakDocumentView alloc] init];
-		self.textView = self.documentView.textView;
-		self.textView.delegate = self;
-
+		self.documentsView = [[DocumentSplitsView alloc] initWithFrame:NSZeroRect];
+		[self.documentsView getTextView].delegate = self;
+		
 		self.layoutView = [[ProjectLayoutView alloc] initWithFrame:NSZeroRect];
 		self.layoutView.tabBarView   = self.tabBarView;
-		[self.layoutView setDocumentView:self.documentView];
+		[self.layoutView setDocumentSplitsView:self.documentsView];
 
 		NSUInteger windowStyle = (NSTitledWindowMask|NSClosableWindowMask|NSResizableWindowMask|NSMiniaturizableWindowMask|NSTexturedBackgroundWindowMask);
 		self.window = [[NSWindow alloc] initWithContentRect:[NSWindow contentRectForFrameRect:[self frameRectForNewWindow] styleMask:windowStyle] styleMask:windowStyle backing:NSBackingStoreBuffered defer:NO];
@@ -319,7 +318,7 @@ namespace
 	self.window.delegate        = nil;
 	self.tabBarView.dataSource  = nil;
 	self.tabBarView.delegate    = nil;
-	self.textView.delegate      = nil;
+	[self.documentsView removeTextViewDelegates];
 
 	// When option-clicking to close all windows then
 	// messages are sent to our window after windowWillClose:
@@ -412,12 +411,12 @@ namespace
 	[self.window makeKeyAndOrderFront:sender];
 }
 
-- (void)makeTextViewFirstResponder:(id)sender { [self.window makeFirstResponder:self.textView]; }
+- (void)makeTextViewFirstResponder:(id)sender { [self.window makeFirstResponder:[self.documentsView getTextView]]; }
 - (void)close                                 { [self.window close]; }
 
 - (IBAction)moveFocus:(id)sender
 {
-	if([self.window firstResponder] == self.textView)
+	if([self.window firstResponder] == [self.documentsView getTextView])
 	{
 		self.fileBrowserVisible = YES;
 		NSOutlineView* outlineView = self.fileBrowser.outlineView;
@@ -448,7 +447,7 @@ namespace
 	self.htmlOutputInWindow = [[[NSUserDefaults standardUserDefaults] objectForKey:kUserDefaultsHTMLOutputPlacementKey] isEqualToString:@"window"];
 	self.disableFileBrowserWindowResize = [[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsDisableFileBrowserWindowResizeKey];
 	self.autoRevealFile = [[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsAutoRevealFileKey];
-	self.documentView.hideStatusBar = [[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsHideStatusBarKey];
+	self.documentsView.hideStatusBar = [[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsHideStatusBarKey];
 
 	if(self.layoutView.fileBrowserOnRight != [[[NSUserDefaults standardUserDefaults] objectForKey:kUserDefaultsFileBrowserPlacementKey] isEqualToString:@"right"])
 	{
@@ -460,7 +459,7 @@ namespace
 - (void)applicationDidBecomeActiveNotification:(NSNotification*)aNotification
 {
 	if(!_documents.empty())
-		[self.textView performSelector:@selector(applicationDidBecomeActiveNotification:) withObject:aNotification];
+		[[self.documentsView getTextView] performSelector:@selector(applicationDidBecomeActiveNotification:) withObject:aNotification];
 }
 
 - (void)applicationDidResignActiveNotification:(NSNotification*)aNotification
@@ -507,7 +506,7 @@ namespace
 	callback->save_next();
 
 	if(!_documents.empty())
-		[self.textView performSelector:@selector(applicationDidResignActiveNotification:) withObject:aNotification];
+		[[self.documentsView getTextView] performSelector:@selector(applicationDidResignActiveNotification:) withObject:aNotification];
 }
 
 // =================
@@ -1540,7 +1539,7 @@ namespace
 	ASSERT(!newSelectedDocument || newSelectedDocument->is_open());
 	if(_selectedDocument == newSelectedDocument)
 	{
-		[self.documentView setDocument:_selectedDocument];
+		[self.documentsView.documentView setDocument:_selectedDocument];
 		return;
 	}
 
@@ -1570,7 +1569,7 @@ namespace
 		self.documentIsModified  = _selectedDocument->is_modified();
 		self.documentIsOnDisk    = _selectedDocument->is_on_disk();
 
-		[self.documentView setDocument:_selectedDocument];
+		[self.documentsView.documentView setDocument:_selectedDocument];
 		[[self class] scheduleSessionBackup:self];
 	}
 	else
@@ -2058,7 +2057,7 @@ namespace
 	{
 		[aWindow layoutIfNeeded];
 		NSRect frame  = [aWindow frame];
-		NSRect parent = [self.window convertRectToScreen:[_textView convertRect:[_textView visibleRect] toView:nil]];
+		NSRect parent = [_window convertRectToScreen:[[self.documentsView getTextView] convertRect:[[self.documentsView getTextView] visibleRect] toView:nil]];
 
 		frame.origin.x = NSMinX(parent) + round((NSWidth(parent)  - NSWidth(frame))  * 1 / 4);
 		frame.origin.y = NSMinY(parent) + round((NSHeight(parent) - NSHeight(frame)) * 3 / 4);
@@ -2080,7 +2079,7 @@ namespace
 	find.projectIdentifier  = self.identifier;
 
 	NSInteger mode = [sender respondsToSelector:@selector(tag)] ? [sender tag] : find_tags::in_document;
-	if(mode == find_tags::in_document && ![[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsAlwaysFindInDocument] && [self.window isKeyWindow] && self.textView.hasMultiLineSelection)
+	if(mode == find_tags::in_document && ![[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsAlwaysFindInDocument] && [self.window isKeyWindow] && [self.documentsView getTextView].hasMultiLineSelection)
 		mode = find_tags::in_selection;
 
 	switch(mode)
@@ -2143,7 +2142,7 @@ namespace
 		}
 	}
 
-	[fc showWindowRelativeToFrame:[self.window convertRectToScreen:[self.textView convertRect:[self.textView visibleRect] toView:nil]]];
+	[fc showWindowRelativeToFrame:[self.window convertRectToScreen:[[self.documentsView getTextView] convertRect:[[self.documentsView getTextView] visibleRect] toView:nil]]];
 }
 
 - (void)fileChooserDidSelectItems:(FileChooser*)sender
@@ -2182,20 +2181,20 @@ namespace
 
 - (NSPoint)positionForWindowUnderCaret
 {
-	return [self.textView positionForWindowUnderCaret];
+	return [[self.documentsView getTextView] positionForWindowUnderCaret];
 }
 
 - (void)performBundleItem:(bundles::item_ptr const&)anItem
 {
 	if(anItem->kind() == bundles::kItemTypeTheme)
 	{
-		[self.documentView setThemeWithUUID:[NSString stringWithCxxString:anItem->uuid()]];
+		[self.documentsView setThemeWithUUID:[NSString stringWithCxxString:anItem->uuid()]];
 	}
 	else
 	{
 		[self showWindow:self];
 		[self makeTextViewFirstResponder:self];
-		[self.textView performBundleItem:anItem];
+		[[self.documentsView getTextView] performBundleItem:anItem];
 	}
 }
 
@@ -2333,11 +2332,11 @@ namespace
 	else if([menuItem action] == @selector(goToProjectFolder:))
 		active = self.projectPath != nil;
 	else if([menuItem action] == @selector(goToParentFolder:))
-		active = [self.window firstResponder] != self.textView;
+		active = [self.window firstResponder] != [self.documentsView getTextView];
 	else if([menuItem action] == @selector(reload:) || [menuItem action] == @selector(deselectAll:))
 		active = self.fileBrowserVisible;
 	else if([menuItem action] == @selector(moveFocus:))
-		[menuItem setTitle:self.window.firstResponder == self.textView ? @"Move Focus to File Browser" : @"Move Focus to Document"];
+		[menuItem setTitle:self.window.firstResponder == [self.documentsView getTextView] ? @"Move Focus to File Browser" : @"Move Focus to Document"];
 	else if([menuItem action] == @selector(takeProjectPathFrom:))
 		[menuItem setState:[self.defaultProjectPath isEqualToString:[menuItem representedObject]] ? NSOnState : NSOffState];
 	else if([menuItem action] == @selector(performCloseOtherTabs:))

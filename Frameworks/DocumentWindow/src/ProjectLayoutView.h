@@ -11,6 +11,6 @@
 @property (nonatomic) BOOL htmlOutputOnRight;
 @property (nonatomic) BOOL tabsAboveDocument;
 
-- (void)setDocumentView:(NSView*)aDocumentView;
+- (void)setDocumentSplitsView:(NSView*)aSplitView;
 
 @end
