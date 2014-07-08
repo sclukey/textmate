@@ -61,6 +61,15 @@ PUBLIC @interface DocumentController : NSObject
 - (IBAction)saveAllDocuments:(id)sender;
 // - (IBAction)revertDocumentToSaved:(id)sender;
 
+// ===============
+// = Split Views =
+// ===============
+
+- (IBAction)splitHorizontally:(id)sender;
+- (IBAction)splitVertically:(id)sender;
+- (IBAction)removeCurrentSplit:(id)sender;
+- (IBAction)removeOtherSplits:(id)sender;
+
 // =============================
 // = Opening Auxiliary Windows =
 // =============================

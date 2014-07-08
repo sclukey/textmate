@@ -591,6 +591,31 @@ CA
                                     <action selector="toggleShowInvisibles:" target="-1" id="519"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="HZs-lw-mJn"/>
+                            <menuItem title="Split Horizontally" id="dxE-fV-Yj7">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="splitHorizontally:" target="-1" id="j0X-0u-fIK"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Split Vertically" id="Wj7-nI-rEg">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="splitVertically:" target="-1" id="ZP7-KT-Jtt"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Remove Current Split" id="lpe-Ff-Loz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="removeCurrentSplit:" target="-1" id="m9O-fH-RBt"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Remove Other Splits" id="8Pl-pT-n4O">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="removeOtherSplits:" target="-1" id="Ikd-1G-wAf"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="516"/>
                             <menuItem title="Enable Soft Wrap" keyEquivalent="w" id="211">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>

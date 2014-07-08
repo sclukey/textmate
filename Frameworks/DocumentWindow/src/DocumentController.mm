@@ -2047,6 +2047,32 @@ namespace
 	}
 }
 
+// ===============
+// = Split Views =
+// ===============
+
+- (IBAction)splitHorizontally:(id)sender
+{
+	NSLog(@"Splitting horizontally");
+	[self.documentsView createSplit:NO];
+}
+
+- (IBAction)splitVertically:(id)sender
+{
+	NSLog(@"Splitting vertically");
+	[self.documentsView createSplit:YES];
+}
+
+- (IBAction)removeCurrentSplit:(id)sender
+{
+	NSLog(@"Removing current split");
+}
+
+- (IBAction)removeOtherSplits:(id)sender
+{
+	NSLog(@"Removing all the other splits");
+}
+
 // =============================
 // = Opening Auxiliary Windows =
 // =============================
