@@ -46,6 +46,16 @@
 	[self.splitView adjustSubviews];
 }
 
+- (void)removeCurrentSplit
+{
+	if ([_documentViews count] > 1)
+	{
+		[_documentViews removeObject:self.documentView];
+		[self.documentView removeFromSuperview];
+		self.documentView = [_documentViews firstObject];
+	}
+}
+
 - (OakTextView*)getTextView
 {
 	return self.documentView.textView;

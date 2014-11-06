@@ -2065,7 +2065,7 @@ namespace
 
 - (IBAction)removeCurrentSplit:(id)sender
 {
-	NSLog(@"Removing current split");
+	[self.documentsView removeCurrentSplit];
 }
 
 - (IBAction)removeOtherSplits:(id)sender
