@@ -37,14 +37,16 @@
 	return self;
 }
 
-- (void)createSplit:(bool)isVertical
+- (BOOL)createSplit:(bool)isVertical
 {
 	[self setDocumentView:[[OakDocumentView alloc] init]];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDocumentView:) name:@"OakTextViewDidBecomeFirstResponder" object:self.documentView.textView];
 	[self.documentView setTranslatesAutoresizingMaskIntoConstraints:NO];
 	[_documentViews addObject:self.documentView];
+	[self.splitView setVertical:isVertical];
 	[self.splitView addSubview:self.documentView];
 	[self.splitView adjustSubviews];
+	return YES;
 }
 
 - (void)updateDocumentView:(NSNotification*)aNotification

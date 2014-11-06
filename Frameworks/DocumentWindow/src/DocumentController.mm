@@ -2053,14 +2053,14 @@ namespace
 
 - (IBAction)splitHorizontally:(id)sender
 {
-	NSLog(@"Splitting horizontally");
-	[self.documentsView createSplit:NO];
+	if([self.documentsView createSplit:NO])
+		[self openAndSelectDocument:_documents[self.selectedTabIndex]];
 }
 
 - (IBAction)splitVertically:(id)sender
 {
-	NSLog(@"Splitting vertically");
-	[self.documentsView createSplit:YES];
+	if([self.documentsView createSplit:YES])
+		[self openAndSelectDocument:_documents[self.selectedTabIndex]];
 }
 
 - (IBAction)removeCurrentSplit:(id)sender

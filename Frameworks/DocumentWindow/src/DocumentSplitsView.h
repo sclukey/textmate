@@ -6,7 +6,7 @@
 @property (nonatomic) BOOL hideStatusBar;
 
 - (OakTextView*)getTextView;
-- (void)createSplit:(bool)isVertical;
+- (BOOL)createSplit:(bool)isVertical;
 - (void)removeCurrentSplit;
 - (void)setThemeWithUUID:(NSString*)themeUUID;
 - (void)removeTextViewDelegates;
