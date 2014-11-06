@@ -552,6 +552,12 @@ static std::string shell_quote (std::vector<std::string> paths)
 @synthesize refreshNestCount;
 @synthesize liveSearchString, liveSearchRanges;
 
+- (BOOL)becomeFirstResponder
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"OakTextViewDidBecomeFirstResponder" object:self];
+	return [super becomeFirstResponder];
+}
+
 // =================================
 // = OakTextView Delegate Wrappers =
 // =================================

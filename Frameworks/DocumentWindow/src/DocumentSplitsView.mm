@@ -40,10 +40,24 @@
 - (void)createSplit:(bool)isVertical
 {
 	[self setDocumentView:[[OakDocumentView alloc] init]];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDocumentView:) name:@"OakTextViewDidBecomeFirstResponder" object:self.documentView.textView];
 	[self.documentView setTranslatesAutoresizingMaskIntoConstraints:NO];
 	[_documentViews addObject:self.documentView];
 	[self.splitView addSubview:self.documentView];
 	[self.splitView adjustSubviews];
+}
+
+- (void)updateDocumentView:(NSNotification*)aNotification
+{
+	NSView* textView = [aNotification object];
+	for(OakDocumentView *thisDocument in _documentViews)
+	{
+		if(textView == thisDocument.textView)
+		{
+			self.documentView = thisDocument;
+			break;
+		}
+	}
 }
 
 - (void)removeCurrentSplit
