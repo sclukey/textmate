@@ -7,6 +7,7 @@
 
 - (OakTextView*)getTextView;
 - (BOOL)createSplit:(bool)isVertical;
+- (void)centerNewSplit;
 - (void)removeCurrentSplit;
 - (void)setThemeWithUUID:(NSString*)themeUUID;
 - (void)removeTextViewDelegates;

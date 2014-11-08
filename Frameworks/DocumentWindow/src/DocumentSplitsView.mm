@@ -16,6 +16,7 @@
 @property (nonatomic) NSMutableArray* myConstraints;
 @property (nonatomic) OakSplitView* splitView;
 @property (nonatomic) NSMutableArray* documentViews;
+@property (nonatomic) NSInteger centeringIndex;
 @end
 
 @implementation DocumentSplitsView { OBJC_WATCH_LEAKS(ProjectLayoutView); }
@@ -26,10 +27,11 @@
 		_myConstraints = [NSMutableArray array];
 		_documentViews = [NSMutableArray array];
 		
+		_centeringIndex = -1;
+		
 		self.splitView = [[OakSplitView alloc] initWithFrame:aRect];
 		[self.splitView setTranslatesAutoresizingMaskIntoConstraints:NO];
 		[self addSubview:self.splitView];
-		[self.splitView setVertical:NO];
 		[self.splitView setDividerStyle:NSSplitViewDividerStyleThin];
 		
 		[self createSplit:YES];
@@ -45,8 +47,21 @@
 	[_documentViews addObject:self.documentView];
 	[self.splitView setVertical:isVertical];
 	[self.splitView addSubview:self.documentView];
+	_centeringIndex = [[self.splitView subviews] count] - 2;
 	[self.splitView adjustSubviews];
+	
 	return YES;
+}
+
+- (void)centerNewSplit
+{
+	if(_centeringIndex >= 0)
+	{
+		CGFloat position = ([self.splitView minPossiblePositionOfDividerAtIndex:_centeringIndex] - [self.splitView maxPossiblePositionOfDividerAtIndex:_centeringIndex]) / 2 + [self.splitView maxPossiblePositionOfDividerAtIndex:_centeringIndex];
+		[self.splitView setPosition:position ofDividerAtIndex:_centeringIndex];
+		if(position > 0)
+			_centeringIndex = -1;
+	}
 }
 
 - (void)updateDocumentView:(NSNotification*)aNotification
@@ -57,6 +72,7 @@
 		if(textView == thisDocument.textView)
 		{
 			self.documentView = thisDocument;
+			[self centerNewSplit];
 			break;
 		}
 	}

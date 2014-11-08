@@ -2055,12 +2055,14 @@ namespace
 {
 	if([self.documentsView createSplit:NO])
 		[self openAndSelectDocument:_documents[self.selectedTabIndex]];
+	[self.documentsView centerNewSplit];
 }
 
 - (IBAction)splitVertically:(id)sender
 {
 	if([self.documentsView createSplit:YES])
 		[self openAndSelectDocument:_documents[self.selectedTabIndex]];
+	[self.documentsView centerNewSplit];
 }
 
 - (IBAction)removeCurrentSplit:(id)sender
