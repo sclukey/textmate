@@ -279,6 +279,7 @@ namespace
 		self.tabBarView.delegate   = self;
 
 		self.documentsView = [[DocumentSplitsView alloc] initWithFrame:NSZeroRect];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(activeSplitViewChanged:) name:@"OakSplitViewDocumentChanged" object:self.documentsView];
 		[self.documentsView getTextView].delegate = self;
 		
 		self.layoutView = [[ProjectLayoutView alloc] initWithFrame:NSZeroRect];
@@ -2051,6 +2052,22 @@ namespace
 // = Split Views =
 // ===============
 
+- (void)activeSplitViewChanged:(NSNotification*)aNotification
+{
+	int i = 0;
+	for(auto document : _documents)
+	{
+		if(document == self.documentsView.documentView.document)
+		{
+			[self setSelectedTabIndex:i];
+			[self makeTextViewFirstResponder:self];
+			[self setSelectedDocument:self.documentsView.documentView.document];
+			break;
+		}
+		i++;
+	}
+}
+
 - (IBAction)splitHorizontally:(id)sender
 {
 	if([self.documentsView createSplit:NO])
@@ -2068,6 +2085,7 @@ namespace
 - (IBAction)removeCurrentSplit:(id)sender
 {
 	[self.documentsView removeCurrentSplit];
+	[self activeSplitViewChanged:nil];
 }
 
 - (IBAction)removeOtherSplits:(id)sender

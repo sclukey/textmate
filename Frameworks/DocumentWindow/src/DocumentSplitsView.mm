@@ -73,6 +73,7 @@
 		{
 			self.documentView = thisDocument;
 			[self centerNewSplit];
+			[[NSNotificationCenter defaultCenter] postNotificationName:@"OakSplitViewDocumentChanged" object:self];
 			break;
 		}
 	}
