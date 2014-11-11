@@ -33,23 +33,41 @@
 		[self.splitView setTranslatesAutoresizingMaskIntoConstraints:NO];
 		[self addSubview:self.splitView];
 		[self.splitView setDividerStyle:NSSplitViewDividerStyleThin];
-		
-		[self createSplit:YES];
+
+		[self setDocumentView:[[OakDocumentView alloc] init]];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDocumentView:) name:@"OakTextViewDidBecomeFirstResponder" object:self.documentView.textView];
+		[self.documentView setTranslatesAutoresizingMaskIntoConstraints:NO];
+		[_documentViews addObject:self.documentView];
+		[self.splitView addSubview:self.documentView];
 	}
 	return self;
 }
 
 - (BOOL)createSplit:(bool)isVertical
 {
-	[self setDocumentView:[[OakDocumentView alloc] init]];
+	OakSplitView* superSplitView = (OakSplitView*)[self.documentView superview];
+	OakDocumentView* newDocumentView = [[OakDocumentView alloc] init];
+	newDocumentView.textView.delegate = [self getTextView].delegate;
+	if(isVertical != [superSplitView isVertical] && [[superSplitView subviews] count] > 1)
+	{
+		OakSplitView* newSplitView = [[OakSplitView alloc] initWithFrame:[self.documentView frame]];
+		[newSplitView setDividerStyle:NSSplitViewDividerStyleThin];
+		[newSplitView setTranslatesAutoresizingMaskIntoConstraints:NO];
+		[superSplitView replaceSubview:self.documentView with:newSplitView];
+		[newSplitView addSubview:self.documentView];
+		[newSplitView adjustSubviews];
+		superSplitView = newSplitView;
+	}
+
+	[superSplitView setVertical:isVertical];
+	[self setDocumentView:newDocumentView];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDocumentView:) name:@"OakTextViewDidBecomeFirstResponder" object:self.documentView.textView];
 	[self.documentView setTranslatesAutoresizingMaskIntoConstraints:NO];
 	[_documentViews addObject:self.documentView];
-	[self.splitView setVertical:isVertical];
-	[self.splitView addSubview:self.documentView];
-	_centeringIndex = [[self.splitView subviews] count] - 2;
-	[self.splitView adjustSubviews];
-	
+	[superSplitView addSubview:self.documentView];
+	_centeringIndex = [[superSplitView subviews] count] - 2;
+	self.splitView = superSplitView;
+	[superSplitView adjustSubviews];
 	return YES;
 }
 
@@ -81,12 +99,39 @@
 
 - (void)removeCurrentSplit
 {
-	if ([_documentViews count] > 1)
+	NSView* tmp;
+	NSView* superSplitView;
+
+	if([_documentViews count] <= 1) return;
+
+	superSplitView = [self.documentView superview];
+	[_documentViews removeObject:self.documentView];
+	[self.documentView removeFromSuperview];
+
+	// If the splitView now only has 1 subview (and it's not the last one), then remove it
+	if([[superSplitView subviews] count] == 1 && [[superSplitView superview] isKindOfClass:[OakSplitView class]]/*[_documentViews count] > 1*/)
 	{
-		[_documentViews removeObject:self.documentView];
-		[self.documentView removeFromSuperview];
-		self.documentView = [_documentViews firstObject];
+		tmp = [[superSplitView subviews] objectAtIndex:0];
+		[[superSplitView superview] replaceSubview:superSplitView with:tmp];
+		superSplitView = [tmp superview];
 	}
+
+	if([[superSplitView superview] isKindOfClass:[OakSplitView class]] && [(OakSplitView*)[superSplitView superview] isVertical] == [(OakSplitView*)superSplitView isVertical])
+	{
+		NSArray* subs = [NSArray arrayWithArray:[superSplitView subviews]];
+		tmp = [superSplitView superview];
+		for(NSView* subview : subs)
+		{
+			NSLog(@"%s Moving a subview", sel_getName(_cmd));
+			[tmp addSubview:subview];
+		}
+
+		[superSplitView removeFromSuperview];
+		superSplitView = tmp;
+	}
+
+	[(OakSplitView*)superSplitView adjustSubviews];
+	[self setDocumentView:[[superSplitView subviews] objectAtIndex:0]];
 }
 
 - (OakTextView*)getTextView
@@ -135,7 +180,7 @@
 	[super updateConstraints];
 
 	NSDictionary* views = @{
-		@"documentView"               : self.splitView,
+		@"documentView"               : [[self subviews] objectAtIndex:0],
 	};
 
 	CONSTRAINT(@"V:|[documentView]|", 0);
