@@ -43,6 +43,32 @@
 	return self;
 }
 
+- (NSIndexSet*)splitsWithDocuments:(std::vector<document::document_ptr>)documents
+{
+	NSMutableIndexSet* splitIndexes = [NSMutableIndexSet indexSet];
+	int i = 0;
+
+	for(OakDocumentView *thisDocument in _documentViews)
+	{
+		for(auto document : documents)
+			if(thisDocument.document->identifier() == document->identifier())
+				[splitIndexes addIndex:i];
+		i++;
+	}
+	return splitIndexes;
+}
+
+- (NSInteger)currentViewIndex
+{
+	return [_documentViews indexOfObject:_documentView];
+}
+
+- (void)setCurrentViewIndex:(NSInteger)newCurrentViewIndex
+{
+	if(newCurrentViewIndex < [_documentViews count])
+		[self setDocumentView:[_documentViews objectAtIndex:newCurrentViewIndex]];
+}
+
 - (BOOL)createSplit:(bool)isVertical
 {
 	OakSplitView* superSplitView = (OakSplitView*)[self.documentView superview];

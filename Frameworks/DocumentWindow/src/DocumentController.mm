@@ -662,8 +662,19 @@ namespace
 	self.documents        = newDocuments;
 	self.selectedTabIndex = newSelectedTabIndex;
 
-	if(!newDocuments.empty() && newDocuments[newSelectedTabIndex]->identifier() != selectedUUID)
-		[self openAndSelectDocument:newDocuments[newSelectedTabIndex]];
+	NSInteger currentSplit        = [self.documentsView currentViewIndex];
+	NSIndexSet* invalidSplitViews = [self.documentsView splitsWithDocuments:documentsToClose];
+	if(!newDocuments.empty())
+	{
+		[invalidSplitViews enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+			[self.documentsView setCurrentViewIndex:idx];
+			[self setSelectedDocument:self.documentsView.documentView.document];
+			[self openAndSelectDocument:newDocuments[newSelectedTabIndex]];
+		}];
+	}
+	[self.documentsView setCurrentViewIndex:currentSplit];
+	[self makeTextViewFirstResponder:self];
+	[self setSelectedDocument:self.documentsView.documentView.document];
 }
 
 - (IBAction)performCloseTab:(id)sender
