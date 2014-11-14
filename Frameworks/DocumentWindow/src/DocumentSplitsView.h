@@ -12,5 +12,7 @@
 - (void)centerNewSplit;
 - (void)removeCurrentSplit;
 - (void)setThemeWithUUID:(NSString*)themeUUID;
+- (void)selectNext;
+- (void)selectPrevious;
 - (void)removeTextViewDelegates;
 @end

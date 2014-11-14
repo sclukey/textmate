@@ -2063,6 +2063,18 @@ namespace
 // = Split Views =
 // ===============
 
+- (IBAction)selectNextSplitView:(id)sender
+{
+	[self.documentsView selectNext];
+	[self activeSplitViewChanged:nil];
+}
+
+- (IBAction)selectPreviousSplitView:(id)sender
+{
+	[self.documentsView selectPrevious];
+	[self activeSplitViewChanged:nil];
+}
+
 - (void)activeSplitViewChanged:(NSNotification*)aNotification
 {
 	int i = 0;

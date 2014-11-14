@@ -65,6 +65,8 @@ PUBLIC @interface DocumentController : NSObject
 // = Split Views =
 // ===============
 
+- (IBAction)selectNextSplitView:(id)sender;
+- (IBAction)selectPreviousSplitView:(id)sender;
 - (IBAction)splitHorizontally:(id)sender;
 - (IBAction)splitVertically:(id)sender;
 - (IBAction)removeCurrentSplit:(id)sender;

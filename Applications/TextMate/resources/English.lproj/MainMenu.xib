@@ -1163,6 +1163,21 @@ CQ
                             <menuItem isSeparatorItem="YES" id="333">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
+                            <menuItem title="Select Next Split View" keyEquivalent="}" id="dlM-xW-DYk">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="selectNextSplitView:" target="-1" id="ZlD-rK-7V8"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Select Previous Split View" keyEquivalent="{" id="HtB-da-gA1">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="selectPreviousSplitView:" target="-1" id="FqH-6F-hca"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="eUB-cy-mgg">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
                             <menuItem title="Bring All to Front" id="5">
                                 <connections>
                                     <action selector="arrangeInFront:" target="-1" id="39"/>

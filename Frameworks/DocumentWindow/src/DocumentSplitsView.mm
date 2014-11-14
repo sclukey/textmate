@@ -69,6 +69,18 @@
 		[self setDocumentView:[_documentViews objectAtIndex:newCurrentViewIndex]];
 }
 
+- (void)selectNext
+{
+	[self setCurrentViewIndex:([_documentViews indexOfObject:_documentView] + 1) % [_documentViews count]];
+}
+
+- (void)selectPrevious
+{
+	int idx = [_documentViews indexOfObject:_documentView] - 1;
+	if (idx < 0) idx = [_documentViews count] - 1;
+	[self setCurrentViewIndex:idx % [_documentViews count]];
+}
+
 - (BOOL)createSplit:(bool)isVertical
 {
 	OakSplitView* superSplitView = (OakSplitView*)[self.documentView superview];
