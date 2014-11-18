@@ -172,6 +172,19 @@
 	[self setDocumentView:[[superSplitView subviews] objectAtIndex:0]];
 }
 
+- (void)removeOtherSplits
+{
+	OakDocumentView* currentDocumentView = self.documentView;
+
+	NSArray* subs = [NSArray arrayWithArray:[[[self subviews] objectAtIndex:0] subviews]];
+	for(NSView* subview : subs)
+		[subview removeFromSuperview];
+	[[[self subviews] objectAtIndex:0] addSubview:currentDocumentView];
+	[_documentViews removeObjectsAtIndexes:[_documentViews indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
+		return obj != currentDocumentView;
+	}]];
+}
+
 - (OakTextView*)getTextView
 {
 	return self.documentView.textView;

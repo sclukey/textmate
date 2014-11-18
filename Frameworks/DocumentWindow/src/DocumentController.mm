@@ -2113,7 +2113,8 @@ namespace
 
 - (IBAction)removeOtherSplits:(id)sender
 {
-	NSLog(@"Removing all the other splits");
+	[self.documentsView removeOtherSplits];
+	[self activeSplitViewChanged:nil];
 }
 
 // =============================

@@ -11,6 +11,7 @@
 - (BOOL)createSplit:(bool)isVertical;
 - (void)centerNewSplit;
 - (void)removeCurrentSplit;
+- (void)removeOtherSplits;
 - (void)setThemeWithUUID:(NSString*)themeUUID;
 - (void)selectNext;
 - (void)selectPrevious;
