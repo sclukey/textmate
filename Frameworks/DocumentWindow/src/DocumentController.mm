@@ -92,6 +92,9 @@ static BOOL IsInShouldTerminateEventLoop = NO;
 
 - (void)takeNewTabIndexFrom:(id)sender;   // used by newDocumentInTab:
 - (void)takeTabsToTearOffFrom:(id)sender; // used by moveDocumentToNewWindow:
+
+- (void)setSelectedDocument:(document::document_ptr const&)newSelectedDocument atIndex:(NSInteger)index;
+- (void)openAndSelectDocument:(document::document_ptr const&)aDocument replacingDocuments:(std::vector<document::document_ptr>)oldDocuments;
 @end
 
 namespace
@@ -662,19 +665,8 @@ namespace
 	self.documents        = newDocuments;
 	self.selectedTabIndex = newSelectedTabIndex;
 
-	NSInteger currentSplit        = [self.documentsView currentViewIndex];
-	NSIndexSet* invalidSplitViews = [self.documentsView splitsWithDocuments:documentsToClose];
-	if(!newDocuments.empty())
-	{
-		[invalidSplitViews enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-			[self.documentsView setCurrentViewIndex:idx];
-			[self setSelectedDocument:self.documentsView.documentView.document];
-			[self openAndSelectDocument:newDocuments[newSelectedTabIndex]];
-		}];
-	}
-	[self.documentsView setCurrentViewIndex:currentSplit];
-	[self makeTextViewFirstResponder:self];
-	[self setSelectedDocument:self.documentsView.documentView.document];
+	if(!newDocuments.empty() && newDocuments[newSelectedTabIndex]->identifier() != selectedUUID)
+		[self openAndSelectDocument:newDocuments[newSelectedTabIndex] replacingDocuments:documentsToClose];
 }
 
 - (IBAction)performCloseTab:(id)sender
@@ -1045,14 +1037,22 @@ namespace
 // = Document I/O =
 // ================
 
-- (void)openAndSelectDocument:(document::document_ptr const&)aDocument
+- (void)openAndSelectDocument:(document::document_ptr const&)aDocument replacingDocuments:(std::vector<document::document_ptr>)oldDocuments
 {
 	document::document_ptr doc = aDocument;
 	[[DocumentOpenHelper new] tryOpenDocument:doc forWindow:self.window completionHandler:^(std::string const& error, oak::uuid_t const& filterUUID){
 		if(error == NULL_STR)
 		{
 			[self makeTextViewFirstResponder:self];
-			[self setSelectedDocument:doc];
+
+			if(oldDocuments.size() == 0)
+				[self setSelectedDocument:doc];
+			else
+			{
+				[[self.documentsView splitsWithDocuments:oldDocuments] enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+					[self setSelectedDocument:doc atIndex:idx];
+				}];
+			}
 		}
 		else
 		{
@@ -1073,6 +1073,11 @@ namespace
 				[self close];
 		}
 	}];
+}
+
+- (void)openAndSelectDocument:(document::document_ptr const&)aDocument
+{
+	[self openAndSelectDocument:aDocument replacingDocuments:std::vector<document::document_ptr>()];
 }
 
 - (IBAction)saveDocument:(id)sender
@@ -1548,10 +1553,15 @@ namespace
 
 - (void)setSelectedDocument:(document::document_ptr const&)newSelectedDocument
 {
+	[self setSelectedDocument:newSelectedDocument atIndex:[self.documentsView currentViewIndex]];
+}
+
+- (void)setSelectedDocument:(document::document_ptr const&)newSelectedDocument atIndex:(NSInteger)index
+{
 	ASSERT(!newSelectedDocument || newSelectedDocument->is_open());
 	if(_selectedDocument == newSelectedDocument)
 	{
-		[self.documentsView.documentView setDocument:_selectedDocument];
+		[self.documentsView setDocument:_selectedDocument atIndex:index];
 		return;
 	}
 
@@ -1581,7 +1591,7 @@ namespace
 		self.documentIsModified  = _selectedDocument->is_modified();
 		self.documentIsOnDisk    = _selectedDocument->is_on_disk();
 
-		[self.documentsView.documentView setDocument:_selectedDocument];
+		[self.documentsView setDocument:_selectedDocument atIndex:index];
 		[[self class] scheduleSessionBackup:self];
 	}
 	else

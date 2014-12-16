@@ -220,6 +220,11 @@
 	_documentView = aDocumentView;
 }
 
+- (void)setDocument:(document::document_ptr)aDocument atIndex:(NSInteger)index
+{
+	[(OakDocumentView*)[_documentViews objectAtIndex:index] setDocument:aDocument];
+}
+
 #ifndef CONSTRAINT
 #define CONSTRAINT(str, align) [_myConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:str options:align metrics:nil views:views]]
 #endif
