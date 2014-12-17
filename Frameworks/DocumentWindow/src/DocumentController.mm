@@ -977,8 +977,12 @@ namespace
 	std::transform(documents.begin(), documents.end(), inserter(newUUIDs, newUUIDs.end()), [](document::document_ptr const& doc){ return doc->identifier(); });
 	std::set_difference(newUUIDs.begin(), newUUIDs.end(), oldUUIDs.begin(), oldUUIDs.end(), inserter(actualNewUUIDs, actualNewUUIDs.end()));
 
+	std::vector<document::document_ptr> documentsToReplace;
 	if(!actualNewUUIDs.empty() && !oldDocuments.empty() && is_disposable(oldDocuments[split]))
+	{
 			oldDocuments.erase(oldDocuments.begin() + split);
+			documentsToReplace.push_back(oldDocuments[split]);
+	}
 	else	++split;
 
 	std::vector<document::document_ptr> newDocuments;
@@ -988,7 +992,7 @@ namespace
 	self.selectedTabIndex = split;
 
 	if(!newDocuments.empty())
-		[self openAndSelectDocument:newDocuments[split]];
+		[self openAndSelectDocument:newDocuments[split] replacingDocuments:documentsToReplace];
 
 	if(closeOtherTabsFlag)
 	{
