@@ -93,7 +93,7 @@ static BOOL IsInShouldTerminateEventLoop = NO;
 - (void)takeNewTabIndexFrom:(id)sender;   // used by newDocumentInTab:
 - (void)takeTabsToTearOffFrom:(id)sender; // used by moveDocumentToNewWindow:
 
-- (void)setSelectedDocument:(document::document_ptr const&)newSelectedDocument atIndex:(NSInteger)index;
+- (void)setSelectedDocument:(document::document_ptr const&)newSelectedDocument atIndex:(NSInteger)index quietly:(BOOL)quiet;
 - (void)openAndSelectDocument:(document::document_ptr const&)aDocument replacingDocuments:(std::vector<document::document_ptr>)oldDocuments;
 @end
 
@@ -1054,7 +1054,7 @@ namespace
 			else
 			{
 				[[self.documentsView splitsWithDocuments:oldDocuments] enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-					[self setSelectedDocument:doc atIndex:idx];
+					[self setSelectedDocument:doc atIndex:idx quietly:NO];
 				}];
 			}
 		}
@@ -1557,15 +1557,15 @@ namespace
 
 - (void)setSelectedDocument:(document::document_ptr const&)newSelectedDocument
 {
-	[self setSelectedDocument:newSelectedDocument atIndex:[self.documentsView currentViewIndex]];
+	[self setSelectedDocument:newSelectedDocument atIndex:[self.documentsView currentViewIndex] quietly:NO];
 }
 
-- (void)setSelectedDocument:(document::document_ptr const&)newSelectedDocument atIndex:(NSInteger)index
+- (void)setSelectedDocument:(document::document_ptr const&)newSelectedDocument atIndex:(NSInteger)index quietly:(BOOL)quiet
 {
 	ASSERT(!newSelectedDocument || newSelectedDocument->is_open());
 	if(_selectedDocument == newSelectedDocument)
 	{
-		[self.documentsView setDocument:_selectedDocument atIndex:index];
+		[self.documentsView setDocument:_selectedDocument atIndex:index quietly:quiet];
 		return;
 	}
 
@@ -1595,7 +1595,7 @@ namespace
 		self.documentIsModified  = _selectedDocument->is_modified();
 		self.documentIsOnDisk    = _selectedDocument->is_on_disk();
 
-		[self.documentsView setDocument:_selectedDocument atIndex:index];
+		[self.documentsView setDocument:_selectedDocument atIndex:index quietly:NO];
 		[[self class] scheduleSessionBackup:self];
 	}
 	else
@@ -2098,7 +2098,7 @@ namespace
 		{
 			[self setSelectedTabIndex:i];
 			[self makeTextViewFirstResponder:self];
-			[self setSelectedDocument:self.documentsView.documentView.document];
+			[self setSelectedDocument:self.documentsView.documentView.document atIndex:[self.documentsView currentViewIndex] quietly:YES];
 			break;
 		}
 		i++;

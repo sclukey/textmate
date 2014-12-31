@@ -15,4 +15,7 @@ PUBLIC @interface OakDocumentView : NSView
 - (void)removeAuxiliaryView:(NSView*)aView;
 
 - (IBAction)showSymbolChooser:(id)sender;
+
+- (void)setDocument:(document::document_ptr const&)aDocument quietly:(BOOL)quiet;
+- (void)setDocument:(document::document_ptr const&)aDocument;
 @end

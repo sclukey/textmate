@@ -326,6 +326,11 @@ private:
 
 - (void)setDocument:(document::document_ptr const&)aDocument
 {
+	[self setDocument:aDocument quietly:NO];
+}
+
+- (void)setDocument:(document::document_ptr const&)aDocument quietly:(BOOL)quiet
+{
 	document::document_ptr oldDocument = document;
 	if(oldDocument)
 		oldDocument->remove_callback(callback);
@@ -344,7 +349,7 @@ private:
 		statusBar.softTabs = document->buffer().indent().soft_tabs();
 	}
 
-	[textView setDocument:document];
+	[textView setDocument:document quietly:quiet];
 	[gutterView reloadData:self];
 	[self updateStyle];
 

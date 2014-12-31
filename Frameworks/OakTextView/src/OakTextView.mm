@@ -635,7 +635,7 @@ static std::string shell_quote (std::vector<std::string> paths)
 	}
 }
 
-- (void)setDocument:(document::document_ptr const&)aDocument
+- (void)setDocument:(document::document_ptr const&)aDocument quietly:(BOOL)quiet
 {
 	if(document && aDocument && *document == *aDocument)
 	{
@@ -646,7 +646,7 @@ static std::string shell_quote (std::vector<std::string> paths)
 			for(auto const& range : ranges)
 				layout->remove_enclosing_folds(range.min().index, range.max().index);
 
-			[self ensureSelectionIsInVisibleArea:self];
+			if(!quiet) [self ensureSelectionIsInVisibleArea:self];
 			[self updateSelection];
 		}
 		[self resetBlinkCaretTimer];
@@ -762,7 +762,7 @@ static std::string shell_quote (std::vector<std::string> paths)
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[self setDocument:document::document_ptr()];
+	[self setDocument:document::document_ptr() quietly:YES];
 }
 
 - (void)documentWillSave:(NSNotification*)aNotification

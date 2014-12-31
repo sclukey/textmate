@@ -220,9 +220,9 @@
 	_documentView = aDocumentView;
 }
 
-- (void)setDocument:(document::document_ptr)aDocument atIndex:(NSInteger)index
+- (void)setDocument:(document::document_ptr)aDocument atIndex:(NSInteger)index quietly:(BOOL)quiet
 {
-	[(OakDocumentView*)[_documentViews objectAtIndex:index] setDocument:aDocument];
+	[(OakDocumentView*)[_documentViews objectAtIndex:index] setDocument:aDocument quietly:quiet];
 }
 
 #ifndef CONSTRAINT

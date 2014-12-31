@@ -16,5 +16,5 @@
 - (void)selectNext;
 - (void)selectPrevious;
 - (void)removeTextViewDelegates;
-- (void)setDocument:(document::document_ptr)aDocument atIndex:(NSInteger)index;
+- (void)setDocument:(document::document_ptr)aDocument atIndex:(NSInteger)index quietly:(BOOL)quiet;
 @end
