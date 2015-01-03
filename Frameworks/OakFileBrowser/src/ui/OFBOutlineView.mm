@@ -146,6 +146,9 @@
 	if([event type] != NSLeftMouseDown)
 		return YES;
 
+	if([event clickCount] > 1)
+		return NO;
+
 	NSInteger row = [self rowAtPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
 	NSUInteger hit = row == -1 ? 0 : [[self preparedCellAtColumn:0 row:row] hitTestForEvent:event inRect:[self frameOfCellAtColumn:0 row:row] ofView:self];
 	if(hit & (OFBPathInfoCellHitOpenItem | OFBPathInfoCellHitRevealItem | NSCellHitTrackableArea))
