@@ -13,6 +13,7 @@
 - (void)removeCurrentSplit;
 - (void)removeOtherSplits;
 - (void)setThemeWithUUID:(NSString*)themeUUID;
+- (void)selectSplitHorizontally:(BOOL)isVertical inForwardDirection:(BOOL)isForward;
 - (void)selectNext;
 - (void)selectPrevious;
 - (void)removeTextViewDelegates;

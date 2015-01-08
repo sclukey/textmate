@@ -1163,17 +1163,51 @@ CQ
                             <menuItem isSeparatorItem="YES" id="333">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Select Next Split View" keyEquivalent="}" id="dlM-xW-DYk">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
-                                <connections>
-                                    <action selector="selectNextSplitView:" target="-1" id="ZlD-rK-7V8"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Select Previous Split View" keyEquivalent="{" id="HtB-da-gA1">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
-                                <connections>
-                                    <action selector="selectPreviousSplitView:" target="-1" id="FqH-6F-hca"/>
-                                </connections>
+                            <menuItem title="Select Split View" id="xeL-89-rgD">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" id="XEs-PL-wGZ">
+                                    <items>
+                                        <menuItem title="Above" keyEquivalent="" id="ish-zv-QcO">
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES"/>
+                                            <connections>
+                                                <action selector="selectAboveSplitView:" target="-1" id="eLh-ed-3Ok"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Below" keyEquivalent="" id="tbz-Wz-0sN">
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES"/>
+                                            <connections>
+                                                <action selector="selectBelowSplitView:" target="-1" id="vb6-zJ-336"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Left" keyEquivalent="" id="bk3-YB-TP4">
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES"/>
+                                            <connections>
+                                                <action selector="selectLeftSplitView:" target="-1" id="aR5-rd-k06"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Right" keyEquivalent="" id="tz0-if-atw">
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES"/>
+                                            <connections>
+                                                <action selector="selectRightSplitView:" target="-1" id="Ssd-HV-jgx"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="XRN-JU-qeN">
+                                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                                        </menuItem>
+                                        <menuItem title="Next" keyEquivalent="}" id="eBT-7p-2bq">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="selectNextSplitView:" target="-1" id="Bc7-rh-Vp5"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Previous" keyEquivalent="{" id="FSM-FU-JVp">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="selectPreviousSplitView:" target="-1" id="Vkp-hU-wJN"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="eUB-cy-mgg">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>

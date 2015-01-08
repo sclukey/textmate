@@ -69,6 +69,36 @@
 		[self setDocumentView:[_documentViews objectAtIndex:newCurrentViewIndex]];
 }
 
+- (void)selectSplitHorizontally:(BOOL)isVertical inForwardDirection:(BOOL)isForward
+{
+	NSView* newView = NULL;
+
+	for(NSView* view = self.documentView; [[view superview] isKindOfClass:[OakSplitView class]]; view = [view superview])
+	{
+		if([(OakSplitView*)[view superview] isVertical] == isVertical)
+		{
+			int idx = [[[view superview] subviews] indexOfObject:view] + (isForward ? 1 : -1);
+			if(idx < 0)
+				newView = [[[view superview] subviews] objectAtIndex:([[[view superview] subviews] count] - 1)];
+			else if(idx > [[[view superview] subviews] count] - 1)
+				newView = [[[view superview] subviews] objectAtIndex:0];
+			else
+			{
+				newView = [[[view superview] subviews] objectAtIndex:idx];
+				break;
+			}
+		}
+	}
+
+	if(newView)
+	{
+		while([newView isKindOfClass:[OakSplitView class]])
+			newView = [[newView subviews] objectAtIndex:(isForward ? 0 : ([[newView subviews] count] - 1))];
+
+		[self setDocumentView:(OakDocumentView*)newView];
+	}
+}
+
 - (void)selectNext
 {
 	[self setCurrentViewIndex:([_documentViews indexOfObject:_documentView] + 1) % [_documentViews count]];

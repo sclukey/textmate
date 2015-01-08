@@ -8,8 +8,6 @@
 	"^\UF701"   = "moveToEndOfBlock:";
 	"^$\UF700"  = "moveToBeginningOfBlockAndModifySelection:";
 	"^$\UF701"  = "moveToEndOfBlockAndModifySelection:";
-	"^~\UF700"  = "moveToBeginningOfBlock:";
-	"^~\UF701"  = "moveToEndOfBlock:";
 	"^~$\UF700" = "moveToBeginningOfBlockAndModifySelection:";
 	"^~$\UF701" = "moveToEndOfBlockAndModifySelection:";
 
@@ -19,8 +17,6 @@
 	"^$\UF703"  = "moveSubWordRightAndModifySelection:";
 	"^\U007F"   = "deleteSubWordLeft:";
 	"^\UF728"   = "deleteSubWordRight:";
-	"^~\UF702"  = "moveSubWordLeft:";
-	"^~\UF703"  = "moveSubWordRight:";
 	"^~$\UF702" = "moveSubWordLeftAndModifySelection:";
 	"^~$\UF703" = "moveSubWordRightAndModifySelection:";
 	"^~\U007F"  = "deleteSubWordLeft:";

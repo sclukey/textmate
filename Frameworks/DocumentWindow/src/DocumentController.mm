@@ -2077,6 +2077,30 @@ namespace
 // = Split Views =
 // ===============
 
+- (IBAction)selectAboveSplitView:(id)sender
+{
+	[self.documentsView selectSplitHorizontally:NO inForwardDirection:NO];
+	[self activeSplitViewChanged:nil];
+}
+
+- (IBAction)selectBelowSplitView:(id)sender
+{
+	[self.documentsView selectSplitHorizontally:NO inForwardDirection:YES];
+	[self activeSplitViewChanged:nil];
+}
+
+- (IBAction)selectRightSplitView:(id)sender
+{
+	[self.documentsView selectSplitHorizontally:YES inForwardDirection:YES];
+	[self activeSplitViewChanged:nil];
+}
+
+- (IBAction)selectLeftSplitView:(id)sender
+{
+	[self.documentsView selectSplitHorizontally:YES inForwardDirection:NO];
+	[self activeSplitViewChanged:nil];
+}
+
 - (IBAction)selectNextSplitView:(id)sender
 {
 	[self.documentsView selectNext];
