@@ -10,6 +10,11 @@
 {
 	return YES;
 }
+
+- (NSColor*)dividerColor {
+	return [self isVertical] ? [NSColor controlShadowColor] : [NSColor colorWithCalibratedWhite:0.500 alpha:1];
+}
+
 @end
 
 @interface DocumentSplitsView ()
