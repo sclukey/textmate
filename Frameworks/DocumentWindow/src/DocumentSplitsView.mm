@@ -78,6 +78,9 @@
 {
 	NSView* newView = NULL;
 
+	NSRect currentViewRect      = [self.documentView convertRect:self.documentView.bounds toView:nil];
+	CGFloat currentViewPosition = isVertical ? currentViewRect.origin.y+currentViewRect.size.height : currentViewRect.origin.x+currentViewRect.size.width;
+
 	for(NSView* view = self.documentView; [[view superview] isKindOfClass:[OakSplitView class]]; view = [view superview])
 	{
 		if([(OakSplitView*)[view superview] isVertical] == isVertical)
@@ -97,8 +100,19 @@
 
 	if(newView)
 	{
-		while([newView isKindOfClass:[OakSplitView class]])
-			newView = [[newView subviews] objectAtIndex:(isForward ? 0 : ([[newView subviews] count] - 1))];
+		while([newView isKindOfClass:[OakSplitView class]]) {
+			int closest = 0;
+			CGFloat closestPosition = 1000;
+			for(int i=0; i<[[newView subviews] count]; i++) {
+				NSRect thisRect = [[[newView subviews] objectAtIndex:i] convertRect:((NSView*)[[newView subviews] objectAtIndex:i]).bounds toView:nil];
+				CGFloat thisPosition = abs((isVertical ? thisRect.origin.y+thisRect.size.height : thisRect.size.width) - currentViewPosition);
+				if(thisPosition < closestPosition) {
+					closestPosition = thisPosition;
+					closest = i;
+				}
+			}
+			newView = [[newView subviews] objectAtIndex:closest];
+		}
 
 		[self setDocumentView:(OakDocumentView*)newView];
 	}
